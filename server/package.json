@@ -1,0 +1,34 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "ProjectForge Backend API Server",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test:auth": "node test/auth.test.js",
+    "test:crud": "node test/project.crud.test.js",
+    "test:membership": "node test/membership.test.js",
+    "test:task": "node test/task.pulse.test.js",
+    "test:supervisor": "node test/supervisor.test.js",
+    "seed:supervisors": "node scripts/seedSupervisors.js",
+    "update:supervisors": "node scripts/updateSupervisorProfiles.js",
+    "update": "node scripts/updateSupervisorProfiles.js"
+  },
+  "keywords": [
+    "projectforge",
+    "mern",
+    "express"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.11.4"
+  }
+}
