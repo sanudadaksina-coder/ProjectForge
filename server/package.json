@@ -12,6 +12,7 @@
     "test:task": "node test/task.pulse.test.js",
     "test:supervisor": "node test/supervisor.test.js",
     "test:production": "node test/production.smoke.test.js",
+    "test:vercel": "node test/vercel.function.test.js",
     "seed:supervisors": "node scripts/seedSupervisors.js",
     "update:supervisors": "node scripts/updateSupervisorProfiles.js",
     "update": "node scripts/updateSupervisorProfiles.js"

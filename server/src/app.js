@@ -3,6 +3,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const path = require('path');
+const fs = require('fs');
 
 const authRoutes = require('./routes/authRoutes');
 const projectRoutes = require('./routes/projectRoutes');
@@ -104,19 +105,22 @@ app.use('/api', (req, res) => {
   });
 });
 
-// In production, serve the compiled React frontend from client/dist and handle SPA fallback
+// In production standalone mode, serve the compiled React frontend from client/dist and handle SPA fallback.
+// On Vercel, static assets and SPA rewrites are served directly by Vercel's Edge CDN.
 if (process.env.NODE_ENV === 'production') {
   const clientDistPath = path.join(__dirname, '../../client/dist');
 
-  // Serve compiled static assets
-  app.use(express.static(clientDistPath));
+  if (fs.existsSync(clientDistPath)) {
+    // Serve compiled static assets
+    app.use(express.static(clientDistPath));
 
-  // SPA fallback for all frontend GET routes (e.g., /projects, /dashboard, /supervisors)
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(clientDistPath, 'index.html'));
-  });
+    // SPA fallback for all frontend GET routes (e.g., /projects, /dashboard, /supervisors)
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(clientDistPath, 'index.html'));
+    });
+  }
 
-  // Fallback 404 for non-GET requests to unknown non-API routes
+  // Fallback 404 for non-GET requests or unhandled non-API routes
   app.use((req, res) => {
     res.status(404).json({
       success: false,
