@@ -9,7 +9,7 @@ const startServer = async () => {
     // Connect to MongoDB Atlas BEFORE listening for HTTP requests
     await connectDB();
 
-    const server = app.listen(PORT, () => {
+    const server = app.listen(PORT, '0.0.0.0', () => {
       console.log(`ProjectForge Server listening on port ${PORT} [${process.env.NODE_ENV || 'development'}]`);
     });
 

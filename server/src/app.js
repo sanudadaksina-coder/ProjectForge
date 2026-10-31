@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
+const path = require('path');
 
 const authRoutes = require('./routes/authRoutes');
 const projectRoutes = require('./routes/projectRoutes');
@@ -11,6 +12,11 @@ const supervisorRoutes = require('./routes/supervisorRoutes');
 const supervisionRoutes = require('./routes/supervisionRoutes');
 
 const app = express();
+
+// Trust reverse proxy in production (Render, Heroku, etc.) for HTTPS protocol and secure cookies
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
 
 // Global Middleware
 app.use(cors({
@@ -84,8 +90,8 @@ app.get('/api/health/db', (req, res) => {
   });
 });
 
-// 404 handler for undefined API routes
-app.use((req, res) => {
+// 404 handler for unknown /api routes (ensures API callers never receive HTML)
+app.use('/api', (req, res) => {
   res.status(404).json({
     success: false,
     message: `Cannot ${req.method} ${req.originalUrl}`,
@@ -97,5 +103,46 @@ app.use((req, res) => {
     ]
   });
 });
+
+// In production, serve the compiled React frontend from client/dist and handle SPA fallback
+if (process.env.NODE_ENV === 'production') {
+  const clientDistPath = path.join(__dirname, '../../client/dist');
+
+  // Serve compiled static assets
+  app.use(express.static(clientDistPath));
+
+  // SPA fallback for all frontend GET routes (e.g., /projects, /dashboard, /supervisors)
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(clientDistPath, 'index.html'));
+  });
+
+  // Fallback 404 for non-GET requests to unknown non-API routes
+  app.use((req, res) => {
+    res.status(404).json({
+      success: false,
+      message: `Cannot ${req.method} ${req.originalUrl}`,
+      data: null,
+      errors: [
+        {
+          message: 'The requested route was not found.'
+        }
+      ]
+    });
+  });
+} else {
+  // Development: 404 handler for undefined non-API routes
+  app.use((req, res) => {
+    res.status(404).json({
+      success: false,
+      message: `Cannot ${req.method} ${req.originalUrl}`,
+      data: null,
+      errors: [
+        {
+          message: 'The requested route was not found.'
+        }
+      ]
+    });
+  });
+}
 
 module.exports = app;
