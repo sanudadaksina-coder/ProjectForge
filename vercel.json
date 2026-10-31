@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
-  "buildCommand": "npm --prefix client install && npm --prefix client run build",
+  "buildCommand": "npm ci --prefix client --include=dev && npm run build --prefix client",
   "outputDirectory": "client/dist",
   "regions": [
     "bom1"
